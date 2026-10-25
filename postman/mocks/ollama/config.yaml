@@ -1,0 +1,11 @@
+version: 1
+id: 328978b4-4458-431d-bcb0-00d5a6121e73
+name: Local Ollama translation dependency
+slug: local-ollama-translation-depende
+protocol: http
+interceptRequests: true
+port: 4917
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

@@ -1,0 +1,148 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Local Ollama translation dependency",
+    "version": "1.3.0",
+    "description": "Subset of official Ollama /api/tags and /api/generate used by Zoom Live Translator. Loopback only; no cloud authentication. Generate prompt may include a bounded terminology glossary. Previous dialogue is excluded to prevent context echo; response translates only the current input. No new HTTP fields or endpoints. Unambiguous Russian numeral phrases are normalized to digits in the prompt; source transcripts remain unchanged. Numeric hints preserve parsed input values. Explicit English issue numbers, FIX versions, spoken decimals and PROD identifiers are normalized before generation; selected domain terminology is included even when a custom glossary is saved. Original transcripts remain unchanged; normalized input is journaled. HTTP request and response schemas are unchanged."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:11434"
+    }
+  ],
+  "paths": {
+    "/api/tags": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Installed models",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "models"
+                  ],
+                  "properties": {
+                    "models": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "models": [
+                    {
+                      "name": "translategemma:4b"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/generate": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model",
+                  "prompt",
+                  "stream"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string"
+                  },
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "stream": {
+                    "type": "boolean",
+                    "enum": [
+                      false
+                    ]
+                  },
+                  "keep_alive": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completed generation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "response",
+                    "done"
+                  ],
+                  "properties": {
+                    "response": {
+                      "type": "string"
+                    },
+                    "done": {
+                      "type": "boolean"
+                    },
+                    "done_reason": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "response": "Translated sentence.",
+                  "done": true,
+                  "done_reason": "stop"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Model missing",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "model not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Inference failure",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "model failed to load"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
